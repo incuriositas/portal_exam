@@ -19,5 +19,5 @@ public class ReviewModel implements Serializable {
     private Integer id;
     private LocalDateTime date;
     private String title;
-    private String context;
+    private String content;
 }
