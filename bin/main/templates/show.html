@@ -50,7 +50,8 @@
       <h1 class="my-4" id="mainTitle">
       </h1>
       <!-- Blog Post -->
-      <div class="card mb-4 reviews" >
+      <div class="card mb-4" id="reviews">
+          div.
 <!--        <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">-->
 <!--        <div class="card-body">-->
 <!--          <h2 class="card-title" id="title"></h2>-->
@@ -202,31 +203,7 @@
       document.location.href = "/"+section
     }
   }
-
-    $.ajax({
-      url:"/review",
-      type:"GET",
-      success:function (res) {
-        let data = res;
-
-        $.each(data, function (idx, item) {
-          let title = item['title'];
-          let content = item['content'];
-          let date = item['date'];
-          let dataSection = item['section'];
-          if(dataSection == section){
-            $(".reviews").append(`
-                <div class="card-body">
-                  <h2 class="card-title">${title}</h2>
-                  <p class="card-text">${content}</p>
-                </div>
-                <div class="card-footer">${date}</div>
-                  `)
-          }
-        })
-      }
-    })
-
+  //TODO ajax
 
 </script>
 </body>
