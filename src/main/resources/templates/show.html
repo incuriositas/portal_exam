@@ -156,6 +156,7 @@
       <div class="modal-footer">
         <button class="btn-success" onclick="add()"> 작성완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
+
       </div>
     </div>
   </div>
@@ -165,9 +166,6 @@
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-
-
-
   let section;
   window.onload = function(){
 
@@ -176,11 +174,10 @@
     $("#mainTitle").html(section)
   }
 
-  $(function(data){
-    $("#goPost").click(function(){
+   $("#goPost").click(function(){
       $('div.modal').modal();
     })
-  })
+
 
   async function add() {
     let title = $("#main").val();
@@ -210,6 +207,7 @@
         let data = res;
 
         $.each(data, function (idx, item) {
+          let id = item['id'];
           let title = item['title'];
           let content = item['content'];
           let date = item['date'];
@@ -220,12 +218,42 @@
                   <h2 class="card-title">${title}</h2>
                   <p class="card-text">${content}</p>
                 </div>
-                <div class="card-footer">${date}</div>
+                <div class="card-footer text-muted">${date}
+                  <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
+                      <button class="btn btn-primary delBtn" id=${id}> 삭제 </button>
+                      <button class="btn btn-primary editBtn" id=${id}> 수정 </button>
+                  </div>
+                </div>
+
                   `)
+
+            $(".editBtn").click(function(e){
+              $('div.modal').modal();
+              $.ajax({
+                url:"/review/edit/"+e.target.id,
+                type:"GET",
+                success:function (res) {
+                  $('div.modal').append(`<button class="btn btn-default" data-dismiss="modal"> 삭제하기 </button>`)
+                  console.log(e.target.id)
+                  console.log(res)
+                }
+              })
+            })
+
+            $(".delBtn").click(function(e){
+              $.ajax({
+                url:"/review/del/"+e.target.id,
+                type:"GET",
+                success:function (res) {
+                  document.location.href = "/"+section
+                }
+              })
+            })
           }
         })
       }
     })
+
 
 
 </script>
