@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sun.rmi.runtime.Log;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,13 @@ public class ReviewApiController {
     @GetMapping("/edit/{id}")
     public Optional<ReviewModel> get(@PathVariable("id") Integer id){
         return reviewRepository.findById(id);
+    }
+
+    @PutMapping("")
+    public void update(@RequestBody ReviewModel reviewModel){
+        System.out.println("updateController");
+        reviewService.update(reviewModel);
+//        return new ResponseEntity<>("수정완료",HttpStatus.OK);
     }
 
     @GetMapping("/del/{id}")

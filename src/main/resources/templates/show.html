@@ -50,7 +50,7 @@
       <h1 class="my-4" id="mainTitle">
       </h1>
       <!-- Blog Post -->
-      <div class="card mb-4 reviews" >
+      <div class="reviews" >
 <!--        <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">-->
 <!--        <div class="card-body">-->
 <!--          <h2 class="card-title" id="title"></h2>-->
@@ -133,7 +133,8 @@
   <!-- /.container -->
 </footer>
 
-<div class="modal fade" id="post" >
+
+<div class="modal fade" >
   <div class="modal-dialog">
     <div class="modal-content">
       <!-- header -->
@@ -145,18 +146,18 @@
         <table class="table">
           <tr>
             <td> 제목 </td>
-            <td><input type="text" name="title" class="form-control" id="main"  /></td>
+            <td><input type="text" class="form-control main"  /></td>
           </tr>
           <tr>
             <td> 상세 후기 </td>
-            <td><textarea name="content" class="form-control" rows="10" cols="20" id="content"></textarea></td>
+            <td><textarea class="form-control detail" rows="10" cols="20"></textarea></td>
           </tr>
         </table>
       </div>
       <div class="modal-footer">
-        <button class="btn-success" onclick="add()"> 작성완료 </button>
+        <button class="btn-success" id="confirm" onclick="add()"> 작성완료 </button>
+        <button class="btn-success" type="submit" id="editConfirm" style="display: none"> 수정완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
-
       </div>
     </div>
   </div>
@@ -168,20 +169,19 @@
 <script>
   let section;
   window.onload = function(){
-
-    let splitURL = $(location).attr('pathname').split('/')
+    let splitURL = $(location).attr('pathname').split('/');
     section = splitURL[1]
     $("#mainTitle").html(section)
-  }
+  };
 
    $("#goPost").click(function(){
       $('div.modal').modal();
-    })
+    });
 
 
   async function add() {
-    let title = $("#main").val();
-    let content = $("#content").val();
+    let title = $(".main").val();
+    let content = $(".detail").val();
 
     let res = await fetch('review' , {
       method: 'post',
@@ -196,64 +196,88 @@
       })
     });
     if(res.ok) {
-      document.location.href = "/"+section
+      document.location.reload();
     }
   }
 
+  $.ajax({
+    url: "/review",
+    type: "GET",
+    success: function (res) {
+      let data = res;
+
+      $.each(data, function (idx, item) {
+        let id = item['id'];
+        let title = item['title'];
+        let content = item['content'];
+        let date = item['date'];
+        let dataSection = item['section'];
+        if (dataSection == section) {
+          $(".reviews").append(`
+            <div class="card mb-4" >
+              <div class="card-body">
+                <h2 class="card-title title">${title}</h2>
+                <p class="card-text content">${content}</p>
+              </div>
+              <div class="card-footer text-muted">${date}
+                <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
+                    <button class="btn btn-primary delBtn" id=${id}> 삭제 </button>
+                    <button class="btn btn-primary editBtn" id=${id}> 수정 </button>
+                </div>
+              </div>
+            </div>
+                `);
+
+          $(".editBtn").click(function (e) {
+            $("#editConfirm").show();
+            $('#confirm').hide();
+            $('div.modal').modal();
+            id = e.target.id;
+            $.ajax({
+              url: "/review/edit/" + e.target.id,
+              type: "GET",
+              success: function (res) {
+                title = $('.main').val(res["title"]);
+                id = title.attr('id', e.target.id);
+                content = $('.detail').val(res["content"]);
+              }
+            })
+
+          });
+
+          $(".delBtn").click(function (e) {
+            $.ajax({
+              url: "/review/del/" + e.target.id,
+              type: "GET",
+              success: function (res) {
+                document.location.href = "/" + section
+              }
+            })
+          });
+        }
+      });
+    }
+  });
+
+
+  $("#editConfirm").click(function (e) {
+    $("#editConfirm").hide();
+    $('#confirm').show();
+    console.log($(".main").val()+"value"+$(".detail").val());
     $.ajax({
-      url:"/review",
-      type:"GET",
-      success:function (res) {
-        let data = res;
-
-        $.each(data, function (idx, item) {
-          let id = item['id'];
-          let title = item['title'];
-          let content = item['content'];
-          let date = item['date'];
-          let dataSection = item['section'];
-          if(dataSection == section){
-            $(".reviews").append(`
-                <div class="card-body">
-                  <h2 class="card-title">${title}</h2>
-                  <p class="card-text">${content}</p>
-                </div>
-                <div class="card-footer text-muted">${date}
-                  <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
-                      <button class="btn btn-primary delBtn" id=${id}> 삭제 </button>
-                      <button class="btn btn-primary editBtn" id=${id}> 수정 </button>
-                  </div>
-                </div>
-
-                  `)
-
-            $(".editBtn").click(function(e){
-              $('div.modal').modal();
-              $.ajax({
-                url:"/review/edit/"+e.target.id,
-                type:"GET",
-                success:function (res) {
-                  $('div.modal').append(`<button class="btn btn-default" data-dismiss="modal"> 삭제하기 </button>`)
-                  console.log(e.target.id)
-                  console.log(res)
-                }
-              })
-            })
-
-            $(".delBtn").click(function(e){
-              $.ajax({
-                url:"/review/del/"+e.target.id,
-                type:"GET",
-                success:function (res) {
-                  document.location.href = "/"+section
-                }
-              })
-            })
-          }
-        })
+      url: "/review",
+      type: "PUT",
+      contentType : "application/json; charset=UTF-8",
+      data: JSON.stringify({
+        "id":$(".main").attr('id'),
+        "title" : $(".main").val(),
+        "content" : $(".detail").val()
+      }),
+      success: function() {
+        document.location.reload();
       }
-    })
-
+    });
+  });
 
 
 </script>

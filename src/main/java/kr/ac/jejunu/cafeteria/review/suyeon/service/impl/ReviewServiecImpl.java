@@ -20,4 +20,14 @@ public class ReviewServiecImpl implements ReviewService {
         reviewModel.setDate(LocalDateTime.now());
         reviewRepository.save(reviewModel);
     }
+
+    @Override
+    public void update(ReviewModel reviewModel){
+        ReviewModel review = reviewRepository.getOne(reviewModel.getId());
+        review.setTitle(reviewModel.getTitle());
+        review.setContent(reviewModel.getContent());
+        reviewModel.setDate(LocalDateTime.now());
+        reviewRepository.save(review);
+    }
+
 }
