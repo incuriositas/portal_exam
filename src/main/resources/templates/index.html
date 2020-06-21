@@ -117,7 +117,7 @@
               <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
               <div class="card-body">
                 <h4 class="card-title">
-                  <button class="section" id="chinese_meal">양식</button>
+                  <button class="section" id="chinese_meal">중식</button>
                 </h4>
                 <h5>4,500원</h5>
                 <p class="card-text">운영시간 : 11:00 - 15:00</p>
@@ -217,13 +217,7 @@
 
   $(document).on("click", ".section", function(){
     let section = $(this).attr("id");
-    $.ajax({
-      url: "/",
-      type: "GET",
-      success: function() {
-        document.location.href = "/"+section
-      }
-    })
+    document.location.href = "/"+section;
   })
 </script>
 

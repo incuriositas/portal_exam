@@ -21,16 +21,21 @@ public class GetMenuService {
         Elements contents = doc.select("table tbody tr");
 
         MenuModel menuModel = null;
+        String month = null;
         String day = null;
         String weekend = null;
+
         for (Element content : contents) {
             Elements tdContents = content.select("td.border_right.border_bottom.txt_center");
             if (tdContents.size() == 4) {
                 String[] date = tdContents.get(0).text().split(" ");
-                day = date[0];
-                weekend = date[1];
+                String dates = date[0];
+                String[] splitDay = dates.split("/");
+                month = splitDay[0];
+                day = splitDay[1];
+                weekend = splitDay[1];
                 menuModel = MenuModel.builder()
-                        .day(day)
+                        .day(month+"-"+day)
                         .weekend(weekend)
                         .division(tdContents.get(1).text())
                         .lunch(tdContents.get(2).text())
@@ -39,7 +44,7 @@ public class GetMenuService {
 
             } else if (tdContents.size() == 3) {
                 menuModel = MenuModel.builder()
-                        .day(day)
+                        .day(month+"-"+day)
                         .weekend(weekend)
                         .division(tdContents.get(0).text())
                         .lunch(tdContents.get(1).text())

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
 
@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Blog Home - Start Bootstrap Template</title>
+  <title>Cafeteria Review</title>
 
   <!-- Bootstrap core CSS -->
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -47,7 +47,7 @@
   <div class="row">
     <!-- Blog Entries Column -->
     <div class="col-md-8">
-      <h1 class="my-4" id="mainTitle">
+      <h1 class="my-4" id="mainTitle" th:text="${section}">
       </h1>
       <!-- Blog Post -->
       <div class="reviews" >
@@ -81,11 +81,12 @@
       <div class="card my-4">
         <h5 class="card-header">Search</h5>
         <div class="card-body">
+          <a href="/menuList"> 메뉴 리스트 </a>
           <div class="input-group">
             <input type="text" class="form-control" placeholder="Search for...">
             <span class="input-group-btn">
-                <button class="btn btn-secondary" type="button">Go!</button>
-              </span>
+              <button class="btn btn-secondary" type="button">Go!</button>
+            </span>
           </div>
         </div>
       </div>
@@ -109,11 +110,8 @@
       <!-- Side Widget -->
       <div class="card my-4">
         <h5 class="card-header">Today's Menu</h5>
-        <div class="card-body">
-          잡곡밥 <br>
-          소고기무국 <br>
-          생선까스 <br>
-          배추김치 <br>
+        <div class="card-body today_menu">
+          <!--    오늘의 메뉴 표시      -->
         </div>
       </div>
 
@@ -170,8 +168,42 @@
   let section;
   window.onload = function(){
     let splitURL = $(location).attr('pathname').split('/');
-    section = splitURL[1]
-    $("#mainTitle").html(section)
+    section = splitURL[1];
+
+    let  division = {
+      "regular_meal": "정식",
+      "special_meal": "특식",
+      "western_meal": "양식",
+      "chinese_meal": "중식"
+    };
+
+    let now = new Date();
+    let month = now.getMonth() + 1;
+    let date = now.getDate();
+    if((month + "").length < 2){
+      month = "0" + month;
+    }
+
+    $.ajax({
+      url: "/menu/"+month+"-"+date,
+      type: "GET",
+      success: function (res) {
+        if (section == "ramen") {
+          $(".today_menu").html("라면");
+        } else {
+          for (let i = 0; i < res.length; i++) {
+            if (section == "regular_meal_dinner") {
+              $(".today_menu").html(res[i]["dinner"].replace(/ /g, "<br>"));
+              break;
+            } else if (res[i]["division"] == division[section]) {
+              $(".today_menu").html(res[i]["lunch"].replace(/ /g, "<br>"));
+              break;
+            }
+          }
+        }
+      }
+    });
+
   };
 
    $("#goPost").click(function(){
@@ -249,7 +281,7 @@
             $.ajax({
               url: "/review/del/" + e.target.id,
               type: "GET",
-              success: function (res) {
+              success: function () {
                 document.location.href = "/" + section
               }
             })

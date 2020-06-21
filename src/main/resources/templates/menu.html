@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>MenuList</title>
+</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<body>
+<div class = "container">
+    <div class="jumbotron">
+        <h2 class="display-4"> 백두관 식당 </h2>
+        <hr class="my-4">
+        <p>
+            <span> 과거 및 현재 메뉴 알아보기 </span>
+        </p>
+    </div>
+    <table class= "table">
+        <tr>
+            <th>요일</th>
+            <th>구분</th>
+            <th>점심</th>
+            <th>저녁</th>
+        </tr>
+    </table>
+</div>
+<script>
+    window.onload = function () {
+        $.ajax({
+            url: "/menu",
+            type: "GET",
+            success: function (res) {
+                for(let i=0; i<res.length; i++){
+                    $(".table").append(`
+                    <tr>
+                        <td>${res[i]['day']}</td>
+                        <td>${res[i]['division']}</td>
+                        <td>${res[i]['lunch']}</td>
+                        <td>${res[i]['dinner']}</td>
+                    </tr>
+                `)
+                }
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
