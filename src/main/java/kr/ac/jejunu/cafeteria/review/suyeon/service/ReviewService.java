@@ -1,7 +1,6 @@
 package kr.ac.jejunu.cafeteria.review.suyeon.service;
 
 import kr.ac.jejunu.cafeteria.review.suyeon.model.ReviewModel;
-import kr.ac.jejunu.cafeteria.review.suyeon.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 @Service
