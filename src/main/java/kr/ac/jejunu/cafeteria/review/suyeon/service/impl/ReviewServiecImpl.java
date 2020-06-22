@@ -18,6 +18,7 @@ public class ReviewServiecImpl implements ReviewService {
         reviewModel.setTitle(reviewModel.getTitle());
         reviewModel.setContent(reviewModel.getContent());
         reviewModel.setDate(LocalDateTime.now());
+        reviewModel.setStar(reviewModel.getStar());
         reviewRepository.save(reviewModel);
     }
 
@@ -27,6 +28,7 @@ public class ReviewServiecImpl implements ReviewService {
         review.setTitle(reviewModel.getTitle());
         review.setContent(reviewModel.getContent());
         reviewModel.setDate(LocalDateTime.now());
+        review.setStar(reviewModel.getStar());
         reviewRepository.save(review);
     }
 

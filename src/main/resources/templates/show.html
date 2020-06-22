@@ -16,6 +16,15 @@
   <!-- Custom styles for this template -->
   <link href="css/home.css" rel="stylesheet">
 
+  <style>
+    .star a{
+      text-decoration: none;
+      color: gray;
+    }
+    .star a.on{
+      color: red;
+    }
+  </style>
 </head>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -132,7 +141,7 @@
 </footer>
 
 
-<div class="modal fade" >
+<div class="modal fade" id="addModal">
   <div class="modal-dialog">
     <div class="modal-content">
       <!-- header -->
@@ -144,17 +153,73 @@
         <table class="table">
           <tr>
             <td> 제목 </td>
-            <td><input type="text" class="form-control main"  /></td>
+            <td><input type="text" class="form-control addTitle"  /></td>
           </tr>
           <tr>
             <td> 상세 후기 </td>
-            <td><textarea class="form-control detail" rows="10" cols="20"></textarea></td>
+            <td><textarea class="form-control addContent" rows="10" cols="20"></textarea></td>
           </tr>
+          <tr>
+            <td> 맛 평가 </td>
+            <td>
+              <p class="star">
+                <a href="#" value="0"></a>
+                <a href="#" value="1">★</a>
+                <a href="#" value="2">★</a>
+                <a href="#" value="3">★</a>
+                <a href="#" value="4">★</a>
+                <a href="#" value="5">★</a>
+              </p>
+            </td>
+          </tr>
+
         </table>
       </div>
       <div class="modal-footer">
         <button class="btn-success" id="confirm" onclick="add()"> 작성완료 </button>
-        <button class="btn-success" type="submit" id="editConfirm" style="display: none"> 수정완료 </button>
+        <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="editModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- header -->
+      <div class="modal-header">
+        <h4 class="modal-title">후기작성</h4>
+        <button type="button" class="close" data-dismiss="modal">×</button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <tr>
+            <td> 제목 </td>
+            <td><input type="text" class="form-control editTitle"/></td>
+          </tr>
+          <tr>
+            <td> 상세 후기 </td>
+            <td><textarea class="form-control editContent" rows="10" cols="20" ></textarea></td>
+          </tr>
+          <tr>
+            <td> 맛 평가 </td>
+            <td>
+              <p class="star">
+                <a href="#" value="0" id="0"></a>
+                <a href="#" value="1" id="1">★</a>
+                <a href="#" value="2" id="2">★</a>
+                <a href="#" value="3" id="3">★</a>
+                <a href="#" value="4" id="4">★</a>
+                <a href="#" value="5" id="5">★</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-success" type="submit" id="editConfirm"> 수정완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
       </div>
     </div>
@@ -165,8 +230,10 @@
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-  let section;
+  let section,tempStar;
+
   window.onload = function(){
+    tempStar = 0;
     let splitURL = $(location).attr('pathname').split('/');
     section = splitURL[1];
 
@@ -203,17 +270,16 @@
         }
       }
     });
-
   };
 
    $("#goPost").click(function(){
-      $('div.modal').modal();
+      $('#addModal').modal();
     });
 
-
   async function add() {
-    let title = $(".main").val();
-    let content = $(".detail").val();
+    let title = $(".addTitle").val();
+    let content = $(".addContent").val();
+    let star = tempStar;
 
     let res = await fetch('review' , {
       method: 'post',
@@ -225,6 +291,7 @@
         title,
         content,
         section,
+        star
       })
     });
     if(res.ok) {
@@ -261,17 +328,21 @@
                 `);
 
           $(".editBtn").click(function (e) {
-            $("#editConfirm").show();
-            $('#confirm').hide();
-            $('div.modal').modal();
+            $('#editModal').modal();
             id = e.target.id;
             $.ajax({
               url: "/review/edit/" + e.target.id,
               type: "GET",
               success: function (res) {
-                title = $('.main').val(res["title"]);
+                title = $('.editTitle').val(res["title"]);
                 id = title.attr('id', e.target.id);
-                content = $('.detail').val(res["content"]);
+                content = $('.editContent').val(res["content"]);
+                if(res['star'] != 0){
+                  $('#editModal #'+res["star"]).parent().children("a").removeClass("on");
+                  $('#editModal #'+res["star"]).addClass("on").prevAll("a").addClass("on");
+                }else{
+                  $('#editModal #0').parent().children("a").removeClass("on");
+                }
               }
             })
 
@@ -291,19 +362,16 @@
     }
   });
 
-
   $("#editConfirm").click(function (e) {
-    $("#editConfirm").hide();
-    $('#confirm').show();
-    console.log($(".main").val()+"value"+$(".detail").val());
     $.ajax({
       url: "/review",
       type: "PUT",
       contentType : "application/json; charset=UTF-8",
       data: JSON.stringify({
-        "id":$(".main").attr('id'),
-        "title" : $(".main").val(),
-        "content" : $(".detail").val()
+        "id":$(".editTitle").attr('id'),
+        "title" : $(".editTitle").val(),
+        "content" : $(".editContent").val(),
+        "star" : tempStar
       }),
       success: function() {
         document.location.reload();
@@ -311,6 +379,11 @@
     });
   });
 
+  $('.star a').click(function(){
+    $(this).parent().children("a").removeClass("on");
+    $(this).addClass("on").prevAll("a").addClass("on");
+    tempStar = $(this).attr("value");
+  });
 
 </script>
 </body>
