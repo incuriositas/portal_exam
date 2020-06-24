@@ -40,4 +40,5 @@ public class MenuApiController {
     public List<MenuModel> section(@PathVariable("day") String day){
         return menuRepository.findByDay(day);
     }
+
 }

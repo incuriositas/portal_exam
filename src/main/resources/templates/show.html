@@ -56,7 +56,7 @@
   <div class="row">
     <!-- Blog Entries Column -->
     <div class="col-md-8">
-      <h1 class="my-4" id="mainTitle" th:text="${section}">
+      <h1 class="my-4" id="mainTitle">
       </h1>
       <!-- Blog Post -->
       <div class="reviews" >
@@ -241,8 +241,11 @@
       "regular_meal": "정식",
       "special_meal": "특식",
       "western_meal": "양식",
-      "chinese_meal": "중식"
+      "chinese_meal": "중식",
+      "regular_meal_dinner": "정식저녁",
+      "ramen":"라면"
     };
+    $('#mainTitle').html(division[section]+"리뷰");
 
     let now = new Date();
     let month = now.getMonth() + 1;
@@ -311,12 +314,14 @@
         let content = item['content'];
         let date = item['date'];
         let dataSection = item['section'];
+        let star = item['star'];
         if (dataSection == section) {
           $(".reviews").append(`
             <div class="card mb-4" >
               <div class="card-body">
                 <h2 class="card-title title">${title}</h2>
                 <p class="card-text content">${content}</p>
+                <p class="card-text" id="star${id}"></p>
               </div>
               <div class="card-footer text-muted">${date}
                 <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
@@ -326,6 +331,13 @@
               </div>
             </div>
                 `);
+
+          for(let i=0; i<star; i++){
+            $("#star"+id).append("&#9733;");
+          }
+          for(let i=0; i<5-star; i++){
+            $("#star"+id).append("&#9734;");
+          }
 
           $(".editBtn").click(function (e) {
             $('#editModal').modal();
