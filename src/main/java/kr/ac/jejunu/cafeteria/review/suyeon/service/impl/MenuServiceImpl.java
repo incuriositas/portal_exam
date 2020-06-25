@@ -32,6 +32,11 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuModel> findByDay(String day){
         return menuRepository.findByDay(day);
     }
+
+    @Override
+    public List<MenuModel> findByDivision(String division){
+        return menuRepository.findByDivision(division);
+    }
 }
 
 

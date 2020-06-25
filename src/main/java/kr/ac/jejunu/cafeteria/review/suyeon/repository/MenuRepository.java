@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface MenuRepository extends JpaRepository<MenuModel, Integer> {
     List<MenuModel> findByDay(String day);
+    List<MenuModel> findByDivision(String division);
 }

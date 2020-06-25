@@ -26,12 +26,15 @@
 </div>
 <script>
     window.onload = function () {
-        $.ajax({
-            url: "/menu",
-            type: "GET",
-            success: function (res) {
-                for(let i=0; i<res.length; i++){
-                    $(".table").append(`
+        let splitURL = $(location).attr('pathname').split('/');
+        section = splitURL[2];
+        if(section=='menu'){
+            $.ajax({
+                url:"/menu",
+                type:"GET",
+                success: function (res) {
+                    for(let i=0; i<res.length; i++){
+                        $(".table").append(`
                     <tr>
                         <td>${res[i]['day']}</td>
                         <td>${res[i]['division']}</td>
@@ -39,9 +42,27 @@
                         <td>${res[i]['dinner']}</td>
                     </tr>
                 `)
+                }}
+            })
+        }else {
+            $.ajax({
+                url: "/menu/list/"+section,
+                type: "GET",
+                success: function (res) {
+                    for(let i=0; i<res.length; i++){
+                        $(".table").append(`
+                    <tr>
+                        <td>${res[i]['day']}</td>
+                        <td>${res[i]['division']}</td>
+                        <td>${res[i]['lunch']}</td>
+                        <td>${res[i]['dinner']}</td>
+                    </tr>
+                `)
+                    }
                 }
-            }
-        });
+            });
+        }
+
     }
 
 </script>

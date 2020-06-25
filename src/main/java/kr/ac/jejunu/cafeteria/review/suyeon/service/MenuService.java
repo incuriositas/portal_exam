@@ -11,4 +11,5 @@ public interface MenuService {
 
     List<MenuModel> findAll();
     List<MenuModel> findByDay(String day);
+    List<MenuModel> findByDivision(String division);
 }
