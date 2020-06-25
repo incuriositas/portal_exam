@@ -6,6 +6,8 @@ import kr.ac.jejunu.cafeteria.review.suyeon.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
@@ -19,6 +21,16 @@ public class MenuServiceImpl implements MenuService {
         menuModel.setLunch(menuModel.getLunch());
         menuModel.setDinner(menuModel.getDinner());
         menuRepository.save(menuModel);
+    }
+
+    @Override
+    public List<MenuModel> findAll(){
+        return menuRepository.findAll();
+    }
+
+    @Override
+    public List<MenuModel> findByDay(String day){
+        return menuRepository.findByDay(day);
     }
 }
 

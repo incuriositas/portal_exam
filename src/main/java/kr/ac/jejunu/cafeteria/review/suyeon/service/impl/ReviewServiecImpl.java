@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,4 +35,29 @@ public class ReviewServiecImpl implements ReviewService {
         reviewRepository.save(review);
     }
 
+    @Override
+    public void deleteById(int id){
+        reviewRepository.deleteById(id);
+    }
+
+
+    @Override
+    public List<ReviewModel> findAll(){
+        return reviewRepository.findAll();
+    }
+
+    @Override
+    public Optional<ReviewModel> findById(int id){
+        return reviewRepository.findById(id);
+    }
+
+    @Override
+    public List<Integer> findByStar(String section){
+        return reviewRepository.findByStar(section);
+    }
+
+    @Override
+    public String findByPassword(int id){
+        return reviewRepository.findByPassword(id);
+    }
 }

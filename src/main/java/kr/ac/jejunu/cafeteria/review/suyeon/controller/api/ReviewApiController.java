@@ -14,7 +14,6 @@ import java.util.Optional;
 @RequestMapping("/review")
 public class ReviewApiController {
     private final ReviewService reviewService;
-    private final ReviewRepository reviewRepository;
 
     @PostMapping("")
     public void post(@RequestBody ReviewModel reviewModel){
@@ -23,12 +22,12 @@ public class ReviewApiController {
 
     @GetMapping("")
     public List<ReviewModel> show(){
-        return reviewRepository.findAll();
+        return reviewService.findAll();
     }
 
     @GetMapping("/edit/{id}")
     public Optional<ReviewModel> get(@PathVariable("id") Integer id){
-        return reviewRepository.findById(id);
+        return reviewService.findById(id);
     }
 
     @PutMapping("")
@@ -37,15 +36,15 @@ public class ReviewApiController {
     }
 
     @GetMapping("/del/{id}")
-    public void del(@PathVariable("id") Integer id){
-        reviewRepository.deleteById(id);
+    public void delete(@PathVariable("id") Integer id){
+        reviewService.deleteById(id);
     }
 
     @GetMapping("/{section}")
     public List<Integer> section(@PathVariable String section){
-        return reviewRepository.findBySection(section);
+        return reviewService.findByStar(section);
     }
 
     @PostMapping("/{id}/password")
-    public String check(@PathVariable("id") Integer id){return reviewRepository.findByPassword(id);}
+    public String check(@PathVariable("id") Integer id){return reviewService.findByPassword(id);}
 }

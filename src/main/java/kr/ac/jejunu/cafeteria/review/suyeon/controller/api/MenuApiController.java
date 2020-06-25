@@ -20,7 +20,6 @@ import java.util.List;
 public class MenuApiController {
     private final MenuService menuService;
     private final GetMenuService getMeMuService;
-    private final MenuRepository menuRepository;
 
     @GetMapping("/data")
     public void create(Model model) throws IOException {
@@ -33,12 +32,12 @@ public class MenuApiController {
 
     @GetMapping("")
     public List<MenuModel> show(){
-        return menuRepository.findAll();
+        return menuService.findAll();
     }
 
     @GetMapping("/{day}")
     public List<MenuModel> section(@PathVariable("day") String day){
-        return menuRepository.findByDay(day);
+        return menuService.findByDay(day);
     }
 
 }
