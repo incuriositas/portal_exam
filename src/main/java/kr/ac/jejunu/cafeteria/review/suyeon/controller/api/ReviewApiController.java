@@ -40,11 +40,14 @@ public class ReviewApiController {
         reviewService.deleteById(id);
     }
 
-    @GetMapping("/{section}")
+    @GetMapping("/star/{section}")
     public List<Integer> section(@PathVariable String section){
         return reviewService.findByStar(section);
     }
 
     @PostMapping("/{id}/password")
     public String check(@PathVariable("id") Integer id){return reviewService.findByPassword(id);}
+
+    @GetMapping("/{section}")
+    public List<ReviewModel> review(@PathVariable("section") String section){ return reviewService.findBySection(section);}
 }

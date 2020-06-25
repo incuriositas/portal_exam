@@ -16,4 +16,5 @@ public interface ReviewService {
     Optional<ReviewModel> findById(int id);
     List<Integer> findByStar(String section);
     String findByPassword(int id);
+    List<ReviewModel> findBySection(String section);
 }

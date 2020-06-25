@@ -232,22 +232,8 @@
     let avgStar = {};
     $.each($(".section"),function(idx,section){
       $.ajax({
-        url:"review/"+section.id,
-        type:"get",
-        success: function (res) {
-          sum = 0;
-          for(let i=0; i<res.length; i++){
-            sum += res[i]
-          }
-          avgStar[section.id] = sum/res.length;
-        }
-      });
-    });
-
-    $.each($(".section"),function(idx,section){
-      $.ajax({
-        url:"review/"+section.id,
-        type:"get",
+        url:"review/star/"+section.id,
+        type:"GET",
         success: function (res) {
           sum = 0;
           for(let i=0; i<res.length; i++){

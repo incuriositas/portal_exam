@@ -60,26 +60,18 @@
       </h1>
       <!-- Blog Post -->
       <div class="reviews" >
-<!--        <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">-->
-<!--        <div class="card-body">-->
-<!--          <h2 class="card-title" id="title"></h2>-->
-<!--          <p class="card-text" id="detail">학식은 돈없을때..</p>-->
-<!--          <a href="#" class="btn btn-primary">Read More &rarr;</a>-->
-<!--        </div>-->
-<!--        <div class="card-footer text-muted" id="date">-->
-<!--          Posted on January 1, 2017 by 아무개-->
-<!--        </div>-->
+        <!--   리뷰내역출력들     -->
       </div>
 
       <!-- Pagination -->
-      <ul class="pagination justify-content-center mb-4">
-        <li class="page-item">
-          <a class="page-link" href="#">&larr; Older</a>
-        </li>
-        <li class="page-item disabled">
-          <a class="page-link" href="#">Newer &rarr;</a>
-        </li>
-      </ul>
+<!--      <ul class="pagination justify-content-center mb-4">-->
+<!--        <li class="page-item">-->
+<!--          <a class="page-link pre" href="#">&larr; Older</a>-->
+<!--        </li>-->
+<!--        <li class="page-item">-->
+<!--          <a class="page-link next" href="#">Newer &rarr;</a>-->
+<!--        </li>-->
+<!--      </ul>-->
 
     </div>
 
@@ -91,12 +83,6 @@
         <h5 class="card-header">Search</h5>
         <div class="card-body">
           <a href="/menuList"> 메뉴 리스트 </a>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Search for...">
-            <span class="input-group-btn">
-              <button class="btn btn-secondary" type="button">Go!</button>
-            </span>
-          </div>
         </div>
       </div>
 
@@ -232,7 +218,8 @@
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-  let section,tempStar,checkPassword;
+  let section,tempStar,checkPassword,reviews;
+  let start,end ;
 
   window.onload = function(){
     tempStar = 0;
@@ -276,6 +263,82 @@
         }
       }
     });
+
+    $.ajax({
+      url: "/review/"+section,
+      type: "GET",
+      success: function(res) {
+
+        reviews = res;
+        $.each(reviews, function (idx, item) {
+          let id = item['id'];
+          let title = item['title'];
+          let content = item['content'];
+          let date = item['date'];
+          let star = item['star'];
+          $(".reviews").prepend(`
+          <div class="card mb-4" >
+            <div class="card-body">
+              <h2 class="card-title title">${title}</h2>
+              <p class="card-text content">${content}</p>
+              <p class="card-text" id="star${id}"></p>
+            </div>
+            <div class="card-footer text-muted">${date}
+            <input class="form-text delPassword" id=${id} placeholder="password" />
+              <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
+                  <button class="btn btn-primary delBtn" id=${id}> 삭제 </button>
+                  <button class="btn btn-primary editBtn" id=${id}> 수정 </button>
+              </div>
+            </div>
+          </div>
+          `);
+
+          for(let i=0; i<star; i++){
+            $("#star"+id).append("&#9733;");
+          }
+          for(let i=0; i<5-star; i++){
+            $("#star"+id).append("&#9734;");
+          }
+
+          $(".editBtn").click(function (e) {
+            id = e.target.id;
+            getPassword(id);
+            $('#editModal').modal();
+            $.ajax({
+              url: "/review/edit/" + e.target.id,
+              type: "GET",
+              success: function (res) {
+                title = $('.editTitle').val(res["title"]);
+                id = title.attr('id', e.target.id);
+                content = $('.editContent').val(res["content"]);
+                tempStar = res['star'];
+                if (tempStar != 0) {
+                  $('#editModal #' + tempStar).parent().children("a").removeClass("on");
+                  $('#editModal #' + tempStar).addClass("on").prevAll("a").addClass("on");
+                } else {
+                  $('#editModal #0').parent().children("a").removeClass("on");
+                }
+              }
+            })
+          });
+
+          $(".delBtn").click(function (e) {
+            getPassword(e.target.id);
+            if($(".delPassword").val() == checkPassword) {
+              $.ajax({
+                url: "/review/del/" + e.target.id,
+                type: "GET",
+                success: function () {
+                  document.location.href = "/" + section
+                }
+              })
+            }else{
+              alert("비밀번호가 틀렸습니다.")
+            }
+          });
+        });
+      }
+    });
   };
 
    $("#goPost").click(function(){
@@ -311,85 +374,6 @@
     }
   }
 
-  $.ajax({
-    url: "/review",
-    type: "GET",
-    success: function (res) {
-      let data = res;
-
-      $.each(data, function (idx, item) {
-        let id = item['id'];
-        let title = item['title'];
-        let content = item['content'];
-        let date = item['date'];
-        let dataSection = item['section'];
-        let star = item['star'];
-        if (dataSection == section) {
-          $(".reviews").prepend(`
-            <div class="card mb-4" >
-              <div class="card-body">
-                <h2 class="card-title title">${title}</h2>
-                <p class="card-text content">${content}</p>
-                <p class="card-text" id="star${id}"></p>
-              </div>
-              <div class="card-footer text-muted">${date}
-              <input class="form-text delPassword" id="$[id}" placeholder="password" />
-                <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
-                    <button class="btn btn-primary delBtn" id=${id}> 삭제 </button>
-                    <button class="btn btn-primary editBtn" id=${id}> 수정 </button>
-                </div>
-              </div>
-            </div>
-          `);
-
-          for(let i=0; i<star; i++){
-            $("#star"+id).append("&#9733;");
-          }
-          for(let i=0; i<5-star; i++){
-            $("#star"+id).append("&#9734;");
-          }
-
-          $(".editBtn").click(function (e) {
-            id = e.target.id;
-            getPassword(id);
-            $('#editModal').modal();
-            $.ajax({
-              url: "/review/edit/" + e.target.id,
-              type: "GET",
-              success: function (res) {
-                title = $('.editTitle').val(res["title"]);
-                id = title.attr('id', e.target.id);
-                content = $('.editContent').val(res["content"]);
-                if (res['star'] != 0) {
-                  $('#editModal #' + res["star"]).parent().children("a").removeClass("on");
-                  $('#editModal #' + res["star"]).addClass("on").prevAll("a").addClass("on");
-                } else {
-                  $('#editModal #0').parent().children("a").removeClass("on");
-                }
-              }
-          })
-
-          });
-
-          $(".delBtn").click(function (e) {
-            getPassword(e.target.id);
-            if($(".delPassword").val() == checkPassword) {
-              $.ajax({
-                url: "/review/del/" + e.target.id,
-                type: "GET",
-                success: function () {
-                  document.location.href = "/" + section
-                }
-              })
-            }else{
-              alert("비밀번호가 틀렸습니다.")
-            }
-          });
-        }
-      });
-    }
-  });
-
   $("#editConfirm").click(function (e) {
     if($(".editPassword").val() == checkPassword){
       $.ajax({
@@ -409,7 +393,6 @@
     }else{
       alert("비밀번호가 틀렸습니다.")
     }
-
   });
 
   $('.star a').click(function(){
@@ -431,8 +414,7 @@
       error: function(e) {
         console.log(e);
       }
-    })
-
+    });
   }
 
 </script>

@@ -17,7 +17,7 @@ public class ReviewModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private LocalDateTime date;
+    private String date;
     private String section;
     private String title;
     private String content;

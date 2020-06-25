@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class ReviewServiecImpl implements ReviewService {
         reviewModel.setSection(reviewModel.getSection());
         reviewModel.setTitle(reviewModel.getTitle());
         reviewModel.setContent(reviewModel.getContent());
-        reviewModel.setDate(LocalDateTime.now());
+        reviewModel.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         reviewModel.setStar(reviewModel.getStar());
         reviewModel.setPassword(reviewModel.getPassword());
         reviewRepository.save(reviewModel);
@@ -30,7 +31,7 @@ public class ReviewServiecImpl implements ReviewService {
         ReviewModel review = reviewRepository.getOne(reviewModel.getId());
         review.setTitle(reviewModel.getTitle());
         review.setContent(reviewModel.getContent());
-        reviewModel.setDate(LocalDateTime.now());
+        reviewModel.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         review.setStar(reviewModel.getStar());
         reviewRepository.save(review);
     }
@@ -60,4 +61,7 @@ public class ReviewServiecImpl implements ReviewService {
     public String findByPassword(int id){
         return reviewRepository.findByPassword(id);
     }
+
+    @Override
+    public List<ReviewModel> findBySection(String section){ return reviewRepository.findBySection(section);  }
 }
