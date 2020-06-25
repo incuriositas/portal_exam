@@ -22,4 +22,5 @@ public class ReviewModel implements Serializable {
     private String title;
     private String content;
     private Integer star;
+    private String password;
 }

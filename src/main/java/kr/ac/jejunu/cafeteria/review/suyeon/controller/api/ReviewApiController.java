@@ -45,4 +45,7 @@ public class ReviewApiController {
     public List<Integer> section(@PathVariable String section){
         return reviewRepository.findBySection(section);
     }
+
+    @PostMapping("/{id}/password")
+    public String check(@PathVariable("id") Integer id){return reviewRepository.findByPassword(id);}
 }

@@ -11,4 +11,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<ReviewModel, Integer> {
     @Query(value = "select star from review where section=?1", nativeQuery = true)
     List<Integer> findBySection(String section);
+
+    @Query(value = "select password from review where id=?1", nativeQuery = true)
+    String findByPassword(Integer id);
 }

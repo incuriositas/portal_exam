@@ -257,10 +257,10 @@
           if(isNaN(avgStar[section.id])){
             $("."+section.id).html("아직 리뷰가 없어요ㅠ");
           }else{
-            for(let i=0; i<avgStar[section.id]; i++){
+            for(let i=0; i<parseInt(avgStar[section.id]); i++){
               $("."+section.id).append("&#9733;");
             }
-            for(let i=0; i<5-avgStar[section.id]; i++){
+            for(let i=0; i<5-parseInt(avgStar[section.id]); i++){
               $("."+section.id).append("&#9734;");
             }
           }

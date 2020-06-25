@@ -19,6 +19,7 @@ public class ReviewServiecImpl implements ReviewService {
         reviewModel.setContent(reviewModel.getContent());
         reviewModel.setDate(LocalDateTime.now());
         reviewModel.setStar(reviewModel.getStar());
+        reviewModel.setPassword(reviewModel.getPassword());
         reviewRepository.save(reviewModel);
     }
 

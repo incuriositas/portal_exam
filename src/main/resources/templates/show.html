@@ -176,6 +176,7 @@
         </table>
       </div>
       <div class="modal-footer">
+        <input type="text" class="form-control-plaintext password" placeholder="password"/>
         <button class="btn-success" id="confirm" onclick="add()"> 작성완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
       </div>
@@ -219,6 +220,7 @@
         </table>
       </div>
       <div class="modal-footer">
+        <input type="text" class="form-text editPassword" placeholder="password"/>
         <button class="btn-success" type="submit" id="editConfirm"> 수정완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
       </div>
@@ -230,7 +232,7 @@
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-  let section,tempStar;
+  let section,tempStar,checkPassword;
 
   window.onload = function(){
     tempStar = 0;
@@ -245,6 +247,7 @@
       "regular_meal_dinner": "정식저녁",
       "ramen":"라면"
     };
+
     $('#mainTitle').html(division[section]+"리뷰");
 
     let now = new Date();
@@ -282,23 +285,29 @@
   async function add() {
     let title = $(".addTitle").val();
     let content = $(".addContent").val();
+    let password = $(".password").val();
     let star = tempStar;
 
-    let res = await fetch('review' , {
-      method: 'post',
-      headers: {
-        'Content-Type' : 'application/json',
-        'Charset' : 'UTF-8'
-      },
-      body: JSON.stringify({
-        title,
-        content,
-        section,
-        star
-      })
-    });
-    if(res.ok) {
-      document.location.reload();
+    if(!password){
+      alert("비밀번호를 입력해주세요.");
+    }else {
+      let res = await fetch('review' , {
+        method: 'post',
+        headers: {
+          'Content-Type' : 'application/json',
+          'Charset' : 'UTF-8'
+        },
+        body: JSON.stringify({
+          title,
+          content,
+          section,
+          password,
+          star
+        })
+      });
+      if(res.ok) {
+        document.location.reload();
+      }
     }
   }
 
@@ -316,7 +325,7 @@
         let dataSection = item['section'];
         let star = item['star'];
         if (dataSection == section) {
-          $(".reviews").append(`
+          $(".reviews").prepend(`
             <div class="card mb-4" >
               <div class="card-body">
                 <h2 class="card-title title">${title}</h2>
@@ -324,13 +333,14 @@
                 <p class="card-text" id="star${id}"></p>
               </div>
               <div class="card-footer text-muted">${date}
+              <input class="form-text delPassword" id="$[id}" placeholder="password" />
                 <div class="btn_contain" style="position: absolute; right: 2%; bottom: 3%">
                     <button class="btn btn-primary delBtn" id=${id}> 삭제 </button>
                     <button class="btn btn-primary editBtn" id=${id}> 수정 </button>
                 </div>
               </div>
             </div>
-                `);
+          `);
 
           for(let i=0; i<star; i++){
             $("#star"+id).append("&#9733;");
@@ -340,8 +350,9 @@
           }
 
           $(".editBtn").click(function (e) {
-            $('#editModal').modal();
             id = e.target.id;
+            getPassword(id);
+            $('#editModal').modal();
             $.ajax({
               url: "/review/edit/" + e.target.id,
               type: "GET",
@@ -349,25 +360,30 @@
                 title = $('.editTitle').val(res["title"]);
                 id = title.attr('id', e.target.id);
                 content = $('.editContent').val(res["content"]);
-                if(res['star'] != 0){
-                  $('#editModal #'+res["star"]).parent().children("a").removeClass("on");
-                  $('#editModal #'+res["star"]).addClass("on").prevAll("a").addClass("on");
-                }else{
+                if (res['star'] != 0) {
+                  $('#editModal #' + res["star"]).parent().children("a").removeClass("on");
+                  $('#editModal #' + res["star"]).addClass("on").prevAll("a").addClass("on");
+                } else {
                   $('#editModal #0').parent().children("a").removeClass("on");
                 }
               }
-            })
+          })
 
           });
 
           $(".delBtn").click(function (e) {
-            $.ajax({
-              url: "/review/del/" + e.target.id,
-              type: "GET",
-              success: function () {
-                document.location.href = "/" + section
-              }
-            })
+            getPassword(e.target.id);
+            if($(".delPassword").val() == checkPassword) {
+              $.ajax({
+                url: "/review/del/" + e.target.id,
+                type: "GET",
+                success: function () {
+                  document.location.href = "/" + section
+                }
+              })
+            }else{
+              alert("비밀번호가 틀렸습니다.")
+            }
           });
         }
       });
@@ -375,20 +391,25 @@
   });
 
   $("#editConfirm").click(function (e) {
-    $.ajax({
-      url: "/review",
-      type: "PUT",
-      contentType : "application/json; charset=UTF-8",
-      data: JSON.stringify({
-        "id":$(".editTitle").attr('id'),
-        "title" : $(".editTitle").val(),
-        "content" : $(".editContent").val(),
-        "star" : tempStar
-      }),
-      success: function() {
-        document.location.reload();
-      }
-    });
+    if($(".editPassword").val() == checkPassword){
+      $.ajax({
+        url: "/review",
+        type: "PUT",
+        contentType : "application/json; charset=UTF-8",
+        data: JSON.stringify({
+          "id":$(".editTitle").attr('id'),
+          "title" : $(".editTitle").val(),
+          "content" : $(".editContent").val(),
+          "star" : tempStar
+        }),
+        success: function() {
+          document.location.reload();
+        }
+      });
+    }else{
+      alert("비밀번호가 틀렸습니다.")
+    }
+
   });
 
   $('.star a').click(function(){
@@ -396,6 +417,23 @@
     $(this).addClass("on").prevAll("a").addClass("on");
     tempStar = $(this).attr("value");
   });
+
+  function getPassword(setId) {
+    $.ajax({
+      url : "/review/"+setId+"/password",
+      type : 'POST',
+      data : JSON.stringify({
+        "id":setId
+      }),
+      success: function(res) {
+        checkPassword = res;
+      },
+      error: function(e) {
+        console.log(e);
+      }
+    })
+
+  }
 
 </script>
 </body>
