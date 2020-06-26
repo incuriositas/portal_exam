@@ -161,8 +161,8 @@
 
         </table>
       </div>
-      <div class="modal-footer">
-        <input type="text" class="form-control-plaintext password" placeholder="password"/>
+      <input class="modal-footer">
+        <input type="text" class="form-control-plaintext password" placeholder="password" value="" />
         <button class="btn-success" id="confirm" onclick="add()"> 작성완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
       </div>
@@ -177,7 +177,7 @@
       <!-- header -->
       <div class="modal-header">
         <h4 class="modal-title">후기작성</h4>
-        <button type="button" class="close" data-dismiss="modal">×</button>
+        <button type="button" class="close" data-dismiss="modal" onclick="modalInputReset()">×</button>
       </div>
       <div class="modal-body">
         <table class="table">
@@ -208,7 +208,7 @@
       <div class="modal-footer">
         <input type="text" class="form-text editPassword" placeholder="password"/>
         <button class="btn-success editConfirm" type="submit"> 수정완료 </button>
-        <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
+        <button class="btn btn-default cancel" data-dismiss="modal" onclick="modalInputReset()"> 작성 취소 </button>
       </div>
     </div>
   </div>
@@ -299,6 +299,19 @@
     showReviews();
   });
 
+  function message(response){
+    if(response){
+      alert("성공");
+      document.location.reload();
+    }else{
+      alert("비밀번호를 확인해주세요")
+    }
+  }
+
+  function modalInputReset() {
+    $(".editPassword").val("");
+    $(".editPassword").attr('placeholder','password');
+  }
   function showReviews(){
     $.ajax({
       url: "/review/"+section,
@@ -412,10 +425,8 @@
     }
   }
 
-  async function del(id,pw) {
-    console.log(id);
-    console.log(pw);
-      let res = await fetch('review/del' , {
+  function del(id,pw) {
+      fetch('review/del' , {
         method: 'post',
         headers: {
           'Content-Type' : 'application/json',
@@ -425,14 +436,13 @@
           "id" : parseInt(id),
           "password" : pw
         })
-      });
-      if(res) {
-        document.location.reload();
-      }
+      }).then(res => res.json())
+        .then(response => message(response))
+        .catch(e => console.error(e))
   }
 
-  async function edit(id,pw) {
-    let res = await fetch('review/edit' , {
+  function edit(id,pw) {
+    fetch('review/edit' , {
       method: 'POST',
       headers: {
         'Content-Type' : 'application/json',
@@ -446,10 +456,9 @@
         "content" : $(".editContent").val(),
         "star" : tempStar
       })
-    });
-    if(res) {
-      document.location.reload();
-    }
+    }).then(res => res.json())
+      .then(response => message(response))
+      .catch(e => console.error(e))
   }
 
 </script>
