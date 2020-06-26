@@ -9,12 +9,13 @@ import java.util.Optional;
 @Service
 public interface ReviewService {
     void create(ReviewModel reviewModel);
-    void update(ReviewModel reviewModel);
-    void deleteById(int id);
+    boolean update(ReviewModel reviewModel);
+    boolean delete(ReviewModel reviewModel);
 
     List<ReviewModel> findAll();
     Optional<ReviewModel> findById(int id);
     List<Integer> findByStar(String section);
     String findByPassword(int id);
     List<ReviewModel> findBySection(String section);
+
 }

@@ -27,20 +27,31 @@ public class ReviewServiecImpl implements ReviewService {
     }
 
     @Override
-    public void update(ReviewModel reviewModel){
-        ReviewModel review = reviewRepository.getOne(reviewModel.getId());
-        review.setTitle(reviewModel.getTitle());
-        review.setContent(reviewModel.getContent());
-        reviewModel.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        review.setStar(reviewModel.getStar());
-        reviewRepository.save(review);
+    public boolean update(ReviewModel reviewModel){
+        if(findByPassword(reviewModel.getId()).equals(reviewModel.getPassword())) {
+            ReviewModel review = reviewRepository.getOne(reviewModel.getId());
+            reviewModel.setSection(reviewModel.getSection());
+            review.setTitle(reviewModel.getTitle());
+            review.setContent(reviewModel.getContent());
+            reviewModel.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            review.setStar(reviewModel.getStar());
+            reviewRepository.save(review);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Override
-    public void deleteById(int id){
-        reviewRepository.deleteById(id);
+    public boolean delete(ReviewModel reviewModel){
+        if(findByPassword(reviewModel.getId()).equals(reviewModel.getPassword())){
+            ReviewModel review = reviewRepository.getOne(reviewModel.getId());
+            reviewRepository.delete(review);
+            return true;
+        }else{
+            return false;
+        }
     }
-
 
     @Override
     public List<ReviewModel> findAll(){

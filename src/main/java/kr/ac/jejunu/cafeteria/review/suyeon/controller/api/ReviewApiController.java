@@ -4,6 +4,8 @@ import kr.ac.jejunu.cafeteria.review.suyeon.model.ReviewModel;
 import kr.ac.jejunu.cafeteria.review.suyeon.repository.ReviewRepository;
 import kr.ac.jejunu.cafeteria.review.suyeon.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,23 +32,20 @@ public class ReviewApiController {
         return reviewService.findById(id);
     }
 
-    @PutMapping("")
-    public void update(@RequestBody ReviewModel reviewModel){
-        reviewService.update(reviewModel);
+    @PostMapping("/edit")
+    public ResponseEntity<Boolean> update(@RequestBody ReviewModel reviewModel){
+        return new ResponseEntity<>(reviewService.update(reviewModel),HttpStatus.OK);
     }
 
-    @GetMapping("/del/{id}")
-    public void delete(@PathVariable("id") Integer id){
-        reviewService.deleteById(id);
+    @PostMapping("/del")
+    public ResponseEntity<Boolean> delete(@RequestBody ReviewModel reviewModel) {
+        return new ResponseEntity<>( reviewService.delete(reviewModel) ,HttpStatus.OK );
     }
 
     @GetMapping("/star/{section}")
     public List<Integer> section(@PathVariable String section){
         return reviewService.findByStar(section);
     }
-
-    @PostMapping("/{id}/password")
-    public String check(@PathVariable("id") Integer id){return reviewService.findByPassword(id);}
 
     @GetMapping("/{section}")
     public List<ReviewModel> review(@PathVariable("section") String section){ return reviewService.findBySection(section);}

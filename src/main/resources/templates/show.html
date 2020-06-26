@@ -64,14 +64,14 @@
       </div>
 
       <!-- Pagination -->
-<!--      <ul class="pagination justify-content-center mb-4">-->
-<!--        <li class="page-item">-->
-<!--          <a class="page-link pre" href="#">&larr; Older</a>-->
-<!--        </li>-->
-<!--        <li class="page-item">-->
-<!--          <a class="page-link next" href="#">Newer &rarr;</a>-->
-<!--        </li>-->
-<!--      </ul>-->
+      <ul class="pagination justify-content-center mb-4">
+        <li class="page-item">
+          <button class="page-link pre" href="#"> &larr;  Newer </button>
+        </li>
+        <li class="page-item">
+          <button class="page-link next" href="#"> Older  &rarr;</button>
+        </li>
+      </ul>
 
     </div>
 
@@ -207,7 +207,7 @@
       </div>
       <div class="modal-footer">
         <input type="text" class="form-text editPassword" placeholder="password"/>
-        <button class="btn-success" type="submit" id="editConfirm"> 수정완료 </button>
+        <button class="btn-success editConfirm" type="submit"> 수정완료 </button>
         <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
       </div>
     </div>
@@ -218,34 +218,35 @@
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script>
-  let section,tempStar,checkPassword,reviews;
-  let start,end ;
+  let section,tempStar;
+  let startAdd = 0;
+  let endAdd = 0 ;
 
-  window.onload = function(){
+  window.onload = function() {
     tempStar = 0;
     let splitURL = $(location).attr('pathname').split('/');
     section = splitURL[1];
 
-    let  division = {
+    let division = {
       "regular_meal": "정식",
       "special_meal": "특식",
       "western_meal": "양식",
       "chinese_meal": "중식",
       "regular_meal_dinner": "정식저녁",
-      "ramen":"라면"
+      "ramen": "라면"
     };
 
-    $('#mainTitle').html(division[section]+"리뷰");
+    $('#mainTitle').html(division[section] + "리뷰");
 
     let now = new Date();
     let month = now.getMonth() + 1;
     let date = now.getDate();
-    if((month + "").length < 2){
+    if ((month + "").length < 2) {
       month = "0" + month;
     }
 
     $.ajax({
-      url: "/menu/"+month+"-"+date,
+      url: "/menu/" + month + "-" + date,
       type: "GET",
       success: function (res) {
         if (section == "ramen") {
@@ -263,14 +264,66 @@
         }
       }
     });
+  showReviews();
+  };
 
+  function menuList() {
+    window.location.href="/list/"+section;
+  }
+
+  $('.star a').click(function(){
+    $(this).parent().children("a").removeClass("on");
+    $(this).addClass("on").prevAll("a").addClass("on");
+    tempStar = $(this).attr("value");
+  });
+
+  $("#goPost").click(function(){
+    $('#addModal').modal();
+  });
+
+  $(".editConfirm").click(function (e) {
+    edit(e.target.id,$(".editPassword").val());
+  });
+
+  $('.pre').click(function () {
+    startAdd += 5;
+    endAdd += 5;
+    $('.reviews').empty();
+    showReviews();
+  });
+
+  $('.next').click(function () {
+    startAdd -= 5;
+    endAdd -= 5;
+    $('.reviews').empty();
+    showReviews();
+  });
+
+  function showReviews(){
     $.ajax({
       url: "/review/"+section,
       type: "GET",
       success: function(res) {
+        let start = res.length - 5;
+        let end = res.length;
 
-        reviews = res;
-        $.each(reviews, function (idx, item) {
+        start += startAdd;
+        end += endAdd;
+
+        if(start < 1) {
+          start = 0;
+          $('.next').prop('disabled', true)
+        }else{
+          $('.next').prop('disabled', false)
+        }
+        if(end >= res.length) {
+          end = res.length;
+          $('.pre').prop('disabled', true)
+        }else{
+          $('.pre').prop('disabled', false)
+        }
+
+        $.each(res.slice(start,end), function (idx, item) {
           let id = item['id'];
           let title = item['title'];
           let content = item['content'];
@@ -293,16 +346,16 @@
           </div>
           `);
 
-          for(let i=0; i<star; i++){
-            $("#star"+id).append("&#9733;");
+          for (let i = 0; i < star; i++) {
+            $("#star" + id).append("&#9733;");
           }
-          for(let i=0; i<5-star; i++){
-            $("#star"+id).append("&#9734;");
+          for (let i = 0; i < 5 - star; i++) {
+            $("#star" + id).append("&#9734;");
           }
 
           $(".editBtn").click(function (e) {
             id = e.target.id;
-            getPassword(id);
+            $('.editConfirm').attr("id", id);
             $('#editModal').modal();
             $.ajax({
               url: "/review/edit/" + e.target.id,
@@ -323,27 +376,12 @@
           });
 
           $(".delBtn").click(function (e) {
-            getPassword(e.target.id);
-            if($(".delPassword").val() == checkPassword) {
-              $.ajax({
-                url: "/review/del/" + e.target.id,
-                type: "GET",
-                success: function () {
-                  document.location.href = "/" + section
-                }
-              })
-            }else{
-              alert("비밀번호가 틀렸습니다.")
-            }
-          });
+            del(e.target.id,$(".delPassword").val());
+          })
         });
       }
     });
-  };
-
-   $("#goPost").click(function(){
-      $('#addModal').modal();
-    });
+  }
 
   async function add() {
     let title = $(".addTitle").val();
@@ -374,51 +412,44 @@
     }
   }
 
-  $("#editConfirm").click(function (e) {
-    if($(".editPassword").val() == checkPassword){
-      $.ajax({
-        url: "/review",
-        type: "PUT",
-        contentType : "application/json; charset=UTF-8",
-        data: JSON.stringify({
-          "id":$(".editTitle").attr('id'),
-          "title" : $(".editTitle").val(),
-          "content" : $(".editContent").val(),
-          "star" : tempStar
-        }),
-        success: function() {
-          document.location.reload();
-        }
+  async function del(id,pw) {
+    console.log(id);
+    console.log(pw);
+      let res = await fetch('review/del' , {
+        method: 'post',
+        headers: {
+          'Content-Type' : 'application/json',
+          'Charset' : 'UTF-8'
+        },
+        body: JSON.stringify({
+          "id" : parseInt(id),
+          "password" : pw
+        })
       });
-    }else{
-      alert("비밀번호가 틀렸습니다.")
-    }
-  });
-
-  $('.star a').click(function(){
-    $(this).parent().children("a").removeClass("on");
-    $(this).addClass("on").prevAll("a").addClass("on");
-    tempStar = $(this).attr("value");
-  });
-
-  function getPassword(setId) {
-    $.ajax({
-      url : "/review/"+setId+"/password",
-      type : 'POST',
-      data : JSON.stringify({
-        "id":setId
-      }),
-      success: function(res) {
-        checkPassword = res;
-      },
-      error: function(e) {
-        console.log(e);
+      if(res) {
+        document.location.reload();
       }
-    });
   }
 
-  function menuList() {
-    window.location.href="/list/"+section;
+  async function edit(id,pw) {
+    let res = await fetch('review/edit' , {
+      method: 'POST',
+      headers: {
+        'Content-Type' : 'application/json',
+        'Charset' : 'UTF-8'
+      },
+      body: JSON.stringify({
+        "id" : parseInt(id),
+        "password" : pw,
+        "section" : section,
+        "title" : $(".editTitle").val(),
+        "content" : $(".editContent").val(),
+        "star" : tempStar
+      })
+    });
+    if(res) {
+      document.location.reload();
+    }
   }
 
 </script>
