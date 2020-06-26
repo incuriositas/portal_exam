@@ -133,7 +133,7 @@
       <!-- header -->
       <div class="modal-header">
         <h4 class="modal-title">후기작성</h4>
-        <button type="button" class="close" data-dismiss="modal">×</button>
+        <button type="button" class="close" data-dismiss="modal" onclick="addModalReset()">×</button>
       </div>
       <div class="modal-body">
         <table class="table">
@@ -158,13 +158,12 @@
               </p>
             </td>
           </tr>
-
         </table>
       </div>
-      <input class="modal-footer">
-        <input type="text" class="form-control-plaintext password" placeholder="password" value="" />
-        <button class="btn-success" id="confirm" onclick="add()"> 작성완료 </button>
-        <button class="btn btn-default" data-dismiss="modal"> 작성 취소 </button>
+      <div class="modal-footer">
+        <input type="text" class="form-text password" placeholder="password"/>
+        <button class="btn-success confirm" onclick="add()"> 작성완료 </button>
+        <button class="btn btn-default" data-dismiss="modal" onclick="addModalReset()"> 작성 취소 </button>
       </div>
     </div>
   </div>
@@ -177,7 +176,7 @@
       <!-- header -->
       <div class="modal-header">
         <h4 class="modal-title">후기작성</h4>
-        <button type="button" class="close" data-dismiss="modal" onclick="modalInputReset()">×</button>
+        <button type="button" class="close" data-dismiss="modal" onclick="editModalReset())">×</button>
       </div>
       <div class="modal-body">
         <table class="table">
@@ -208,7 +207,7 @@
       <div class="modal-footer">
         <input type="text" class="form-text editPassword" placeholder="password"/>
         <button class="btn-success editConfirm" type="submit"> 수정완료 </button>
-        <button class="btn btn-default cancel" data-dismiss="modal" onclick="modalInputReset()"> 작성 취소 </button>
+        <button class="btn btn-default cancel" data-dismiss="modal" onclick="editModalReset()"> 작성 취소 </button>
       </div>
     </div>
   </div>
@@ -308,7 +307,16 @@
     }
   }
 
-  function modalInputReset() {
+  function addModalReset() {
+    $(".addTitle").val("");
+    $(".addContent").val("");
+    $(".password").val("");
+    $(".password").attr('placeholder','password');
+    $(".star a").parent().children("a").removeClass("on");
+    tempStar = 0
+  }
+
+  function editModalReset() {
     $(".editPassword").val("");
     $(".editPassword").attr('placeholder','password');
   }
