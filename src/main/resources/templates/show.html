@@ -333,15 +333,19 @@
 
         if(start < 1) {
           start = 0;
-          $('.next').prop('disabled', true)
+          $('.next').prop('disabled', true);
+          $('.next').css({backgroundColor:'lightgray'});
         }else{
-          $('.next').prop('disabled', false)
+          $('.next').prop('disabled', false);
+          $('.next').css({backgroundColor:'white'});
         }
         if(end >= res.length) {
           end = res.length;
-          $('.pre').prop('disabled', true)
+          $('.pre').prop('disabled', true);
+          $('.pre').css({backgroundColor:'lightgray'});
         }else{
-          $('.pre').prop('disabled', false)
+          $('.pre').prop('disabled', false);
+          $('.pre').css({backgroundColor:'white'});
         }
 
         $.each(res.slice(start,end), function (idx, item) {
